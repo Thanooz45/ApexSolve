@@ -11,10 +11,19 @@ import authRoutes from './routes/authRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 
 const app=express();
-const allowedOrigins=(process.env.CLIENT_URL||'http://localhost:5173').split(',').map(value=>value.trim()).filter(Boolean);
+const defaultAllowedOrigins=['http://localhost:5173','https://apex-solve.vercel.app'];
+const configuredOrigins=process.env.CLIENT_URL?.split(',').map(value=>value.trim()).filter(Boolean)??[];
+const allowedOrigins=[...new Set([...defaultAllowedOrigins,...configuredOrigins])];
 app.set('trust proxy',1);
 app.use(helmet({crossOriginResourcePolicy:false}));
-app.use(cors({origin(origin,callback){if(!origin||allowedOrigins.includes(origin))return callback(null,true);const error=new Error('This website is not allowed to access the API.');error.status=403;return callback(error)}}));
+app.use(cors({
+  origin(origin,callback){
+    if(!origin||allowedOrigins.includes(origin))return callback(null,true);
+    const error=new Error('This website is not allowed to access the API.');
+    error.status=403;
+    return callback(error);
+  }
+}));
 app.use(morgan(process.env.NODE_ENV==='production'?'combined':'dev'));
 app.use(express.json({limit:'1mb'}));
 app.use('/api',rateLimit({windowMs:15*60*1000,max:300,standardHeaders:true,legacyHeaders:false,message:{message:'Too many requests. Please try again in a few minutes.'}}));
