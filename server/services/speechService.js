@@ -1,0 +1,1 @@
+import {AssemblyAI} from 'assemblyai'; export async function transcribe(audio){if(!process.env.ASSEMBLYAI_API_KEY)throw Error('ASSEMBLYAI_API_KEY is not configured on the server.');const t=await new AssemblyAI({apiKey:process.env.ASSEMBLYAI_API_KEY}).transcripts.transcribe({audio});if(t.status==='error')throw Error(t.error||'Voice transcription failed.');return t.text}

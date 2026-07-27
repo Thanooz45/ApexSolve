@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+uploads/
+*.log
+hs_err_pid*.log
+replay_pid*.log
+specs.md
+steps.txt
+completed.txt

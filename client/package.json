@@ -1,0 +1,20 @@
+{
+  "name": "apexsolve-ai-client",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "axios": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-hot-toast": "latest",
+    "react-markdown": "latest",
+    "react-router-dom": "latest",
+    "react-syntax-highlighter": "latest",
+    "remark-gfm": "latest"
+  },
+  "devDependencies": { "vite": "latest" }
+}

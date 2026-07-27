@@ -1,0 +1,3 @@
+import mongoose from 'mongoose'; import bcrypt from 'bcryptjs';
+const schema = new mongoose.Schema({ name:{type:String,required:true,trim:true,maxlength:60},email:{type:String,required:true,unique:true,lowercase:true,trim:true},password:{type:String,required:true,select:false,minlength:6},grade:{type:String,enum:['8th','9th','10th','11th','12th','College','Other'],default:'Other'},subjects:[String],totalDoubts:{type:Number,default:0}},{timestamps:true});
+schema.pre('save',async function(){if(this.isModified('password'))this.password=await bcrypt.hash(this.password,12)}); schema.methods.matchPassword=function(v){return bcrypt.compare(v,this.password)}; export default mongoose.model('User',schema);

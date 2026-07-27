@@ -1,0 +1,27 @@
+import 'dotenv/config';
+import 'express-async-errors';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import path from 'path';
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+
+const app=express();
+const allowedOrigins=(process.env.CLIENT_URL||'http://localhost:5173').split(',').map(value=>value.trim()).filter(Boolean);
+app.set('trust proxy',1);
+app.use(helmet({crossOriginResourcePolicy:false}));
+app.use(cors({origin(origin,callback){if(!origin||allowedOrigins.includes(origin))return callback(null,true);const error=new Error('This website is not allowed to access the API.');error.status=403;return callback(error)}}));
+app.use(morgan(process.env.NODE_ENV==='production'?'combined':'dev'));
+app.use(express.json({limit:'1mb'}));
+app.use('/api',rateLimit({windowMs:15*60*1000,max:300,standardHeaders:true,legacyHeaders:false,message:{message:'Too many requests. Please try again in a few minutes.'}}));
+app.use('/api/auth',rateLimit({windowMs:15*60*1000,max:20,standardHeaders:true,legacyHeaders:false,message:{message:'Too many sign-in attempts. Please try again later.'}}));
+app.use('/uploads',express.static(path.resolve('uploads'),{maxAge:process.env.NODE_ENV==='production'?'1d':0}));
+app.get('/api/health',(req,res)=>res.json({ok:true,service:'apexsolve-api'}));
+app.use('/api/auth',authRoutes);
+app.use('/api/chats',chatRoutes);
+app.use((err,req,res,next)=>{const status=err.status||err.statusCode||500;if(process.env.NODE_ENV!=='production'||status>=500)console.error(err);res.status(status).json({message:status>=500&&process.env.NODE_ENV==='production'?'Something went wrong. Please try again.':err.message||'Something went wrong.'})});
+connectDB().then(()=>app.listen(process.env.PORT||5000,()=>console.log(`ApexSolve API listening on port ${process.env.PORT||5000}`))).catch(error=>{console.error('Database connection failed:',error.message);process.exit(1)});

@@ -1,0 +1,3 @@
+import mongoose from 'mongoose';
+const message = new mongoose.Schema({role:{type:String,enum:['user','assistant'],required:true},content:{type:String,required:true},inputType:{type:String,enum:['text','image','voice'],default:'text'},imageUrl:String,audioUrl:String,timestamp:{type:Date,default:Date.now}});
+const schema=new mongoose.Schema({user:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},title:{type:String,default:'New doubt'},subject:{type:String,default:'General'},isArchived:{type:Boolean,default:false},lastActivity:{type:Date,default:Date.now},messages:[message]},{timestamps:true}); schema.index({user:1,lastActivity:-1}); export default mongoose.model('Chat',schema);

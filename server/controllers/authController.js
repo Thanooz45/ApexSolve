@@ -1,0 +1,4 @@
+import jwt from 'jsonwebtoken'; import User from '../models/User.js';
+const token=id=>jwt.sign({id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRE||'7d'});const reply=(res,user,status=200)=>res.status(status).json({token:token(user._id),user:{id:user._id,name:user.name,email:user.email,grade:user.grade,subjects:user.subjects,totalDoubts:user.totalDoubts}});
+export const register=async(req,res)=>{const {name,email,password,grade,subjects=[]}=req.body;if(await User.findOne({email}))return res.status(409).json({message:'An account with this email already exists.'});reply(res,await User.create({name,email,password,grade,subjects}),201)};
+export const login=async(req,res)=>{const u=await User.findOne({email:req.body.email}).select('+password');if(!u||!(await u.matchPassword(req.body.password)))return res.status(401).json({message:'Invalid email or password.'});reply(res,u)}; export const me=(req,res)=>reply(res,req.user);
