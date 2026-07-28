@@ -4,5 +4,6 @@ import {useAuth} from '../../context/AuthContext';
 
 export default function Navbar(){
  const {user,logout}=useAuth(),nav=useNavigate();
- return <header><Link className="brand" to="/dashboard"><BrainCircuit/> Apex<span>Solve</span></Link>{user&&<nav><span className="user-name"><UserRound size={16}/>{user.name}</span><Link to="/dashboard"><LayoutDashboard size={17}/> Dashboard</Link><button className="quiet" onClick={()=>{logout();nav('/')}}><LogOut size={17}/> Sign out</button></nav>}</header>
+ const signedIn=Boolean(user?.name);
+ return <header><Link className="brand" to={signedIn?'/dashboard':'/'}><BrainCircuit/> Apex<span>Solve</span></Link>{signedIn&&<nav aria-label="Signed-in navigation"><span className="user-name"><UserRound size={16}/>{user.name}</span><Link to="/dashboard"><LayoutDashboard size={17}/> Dashboard</Link><button className="quiet" onClick={()=>{logout();nav('/')}}><LogOut size={17}/> Sign out</button></nav>}</header>
 }

@@ -1,4 +1,4 @@
-import {createContext,useContext,useState} from 'react';
+import {createContext,useContext,useEffect,useState} from 'react';
 import api from '../api/api';
 
 const AuthContext=createContext();
@@ -11,5 +11,10 @@ export function AuthProvider({children}){
  const login=async credentials=>{const response=await api.post('/auth/login',credentials);save(response.data)};
  const register=async details=>{const response=await api.post('/auth/register',details);save(response.data)};
  const logout=()=>{localStorage.removeItem('apex_token');localStorage.removeItem('apex_user');setUser(null);if(import.meta.env.DEV)console.info('ApexSolve: user signed out')};
+ useEffect(()=>{
+  const clearExpiredSession=()=>setUser(null);
+  window.addEventListener('apexsolve:session-expired',clearExpiredSession);
+  return()=>window.removeEventListener('apexsolve:session-expired',clearExpiredSession);
+ },[]);
  return <AuthContext.Provider value={{user,login,register,logout}}>{children}</AuthContext.Provider>;
 }
